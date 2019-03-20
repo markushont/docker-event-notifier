@@ -1,0 +1,19 @@
+{
+    "settings": {
+        "logging": "info",
+        "tags": [
+            "seh-green-01"
+        ],
+        "mode": "opt-out",
+        "names": [
+            "docker-events"
+        ]
+    },
+    "events": {
+        "container": {
+            "die": "danger",
+            "stop": "warning",
+            "start": "good"
+        }
+    }
+}
