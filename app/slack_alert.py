@@ -63,6 +63,9 @@ def send(event, config, this_host, severity, timestamp):
 
     logger.info('Event: %s' % json.dumps(payload))
 
+    if 'SLACK_WEBHOOK_CHANNEL_ID' in os.environ:
+        payload['channel'] = os.environ['SLACK_WEBHOOK_CHANNEL_ID']
+
     if 'SLACK_WEBHOOK_URI' in os.environ:
         # Perform request
         try:

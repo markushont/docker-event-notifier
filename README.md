@@ -5,10 +5,11 @@ Catch events from Docker daemon and send notifications (to Slack)
 
 ## Running in Docker
 
-There are two environment variables to set:
+There are three environment variables to set:
 
 * `HOST_NAME`: Name of host machine (optional). Used to label alerts
 * `SLACK_WEBHOOK_URI`: URI to use when posting alerts in Slack
+* `SLACK_WEBHOOK_CHANNEL_ID`: Optionally override channel id for Slack webhook
 
 There are two volumes to be mounted:
 
