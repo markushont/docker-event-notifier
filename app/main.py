@@ -57,7 +57,7 @@ def main():
             timestamp = datetime.datetime.fromtimestamp(
                 event['time']).strftime('%c')
             try:
-                severity = config['events'][event_type][event_action]['severity']
+                severity = config['events'][event_type][event_action]['severity'] or 'good'
                 send_alert(event, timestamp, severity)
             except Exception as e:
                 logger.error('Error sending alert: {}'.format(e))
