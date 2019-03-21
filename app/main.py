@@ -21,6 +21,33 @@ def shutdown(_signo, _stack_frame):
   logger.info('Recieved {}, shutting down'.format(_signo))
   sys.exit(0)
 
+def should_send_alert(event, config):
+    event_actor_name = event['Actor']['Attributes']['name']
+    name_in_config = event_actor_name in config['settings']['names']
+    event_type = event['Type']
+    event_action = event['Action']
+
+    # Does not match mode
+    if 'opt-in' in config['settings']['mode'] and not name_in_config:
+        return False
+    if 'opt-out' in config['settings']['mode'] and name_in_config:
+        return False
+
+    # Has no settings
+    if event_type not in config['events'] or event_action not in config['events'][event_type]:
+        return False
+
+    # Does not match attributes
+    actor_attributes = event['Actor']['Attributes']
+    if 'attributes' in config['events'][event_type]:
+        # Go through attributes if configured
+        config_attributes = config['events'][event_type]['attributes']
+        for attribute in config_attributes:
+            if actor_attributes[attribute] != config[attribute]:
+                return False
+    
+    return True   
+
 def main():
     ''' Look for any event on the event stream that matches the defined event types  '''
     for event in stream:
@@ -29,17 +56,12 @@ def main():
         timestamp = datetime.datetime.fromtimestamp(
             event['time']).strftime('%c')
 
-        if event_type in config['events']:
-            if event_action in config['events'][event_type]:
-                try:
-                    event_actor_name = event['Actor']['Attributes']['name']
-                    name_in_config = event_actor_name in config['settings']['names']
-                    if 'opt-in' in config['settings']['mode'] and name_in_config:
-                        send_alert(event, timestamp, severity=config['events'][event_type][event_action])
-                    if 'opt-out' in config['settings']['mode'] and not name_in_config:
-                        send_alert(event, timestamp, severity=config['events'][event_type][event_action])
-                except:
-                    send_alert(event, timestamp, 'danger')
+        if should_send_alert(event, config):
+            try:
+                severity = config['events'][event_type][event_action]['severity']
+                send_alert(event, timestamp, severity)
+            except Exception as e:
+                logger.error('Error sending alert: {}'.format(e))
 
 
 if __name__ == "__main__":

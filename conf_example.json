@@ -11,9 +11,18 @@
     },
     "events": {
         "container": {
-            "die": "danger",
-            "stop": "warning",
-            "start": "good"
+            "die": {
+                "attributes": {
+                    "exitCode": "1"
+                },
+                "severity": "danger"
+            },
+            "stop": {
+                "severity": "warning"
+            },
+            "start": {
+                "severity": "good"
+            }
         }
     }
 }
