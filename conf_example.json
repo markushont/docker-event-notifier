@@ -23,6 +23,11 @@
             "start": {
                 "severity": "good"
             }
+        },
+        "image": {
+            "delete": {
+                "severity": "warning"
+            }
         }
     }
 }

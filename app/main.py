@@ -51,12 +51,11 @@ def should_send_alert(event, config):
 def main():
     ''' Look for any event on the event stream that matches the defined event types  '''
     for event in stream:
-        event_type = event['Type']
-        event_action = event['Action']
-        timestamp = datetime.datetime.fromtimestamp(
-            event['time']).strftime('%c')
-
         if should_send_alert(event, config):
+            event_type = event['Type']
+            event_action = event['Action']
+            timestamp = datetime.datetime.fromtimestamp(
+                event['time']).strftime('%c')
             try:
                 severity = config['events'][event_type][event_action]['severity']
                 send_alert(event, timestamp, severity)
