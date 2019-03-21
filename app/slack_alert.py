@@ -10,7 +10,7 @@ def send(event, config, this_host, severity, timestamp):
 
     # Define payload
     payload = {
-        "username": "Docker Events",
+        "username": "Docker Event Notifier",
         "attachments": [
             {
                 "fallback": "Docker event triggered on *%s*" % this_host,
