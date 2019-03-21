@@ -16,7 +16,7 @@ There are two volumes to be mounted:
 
 Example Docker run command:
 
-`docker run -e "HOST_NAME=foo_bar" -e "SLACK_WEBHOOK_URI=https://hooks.slack.com/services/XXX/YYY/ZZZ" -v /some_path/conf.json:/app/conf.json -v /var/run/docker.sock:/var/run/docker.sock docker-event-monitor`
+`docker run -e "HOST_NAME=foo_bar" -e "SLACK_WEBHOOK_URI=https://hooks.slack.com/services/XXX/YYY/ZZZ" -v /some_path/conf.json:/app/conf.json -v /var/run/docker.sock:/var/run/docker.sock docker-event-notifier`
 
 ## Configuration
 
