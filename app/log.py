@@ -1,5 +1,6 @@
 import conf
 import logging
+import sys
 
 def load():
     config = conf.load()
@@ -18,9 +19,18 @@ def load():
     else:
         logger.setLevel(logging.INFO)
 
-    ch = logging.StreamHandler()
     formatter = logging.Formatter(
         fmt='%(asctime)s %(levelname)s: %(message)s', datefmt='%d-%m-%Y %I:%M:%S')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+    # Everything <= WARN written to stdout
+    ch1 = logging.StreamHandler(sys.stdout)
+    ch1.setLevel(logging.DEBUG)
+    ch1.addFilter(lambda record: record.levelno <= logging.WARN)
+    ch1.setFormatter(formatter)
+    # Everything == ERROR written to stderr
+    ch2 = logging.StreamHandler(sys.stderr)
+    ch2.setLevel(logging.ERROR)
+    ch2.setFormatter(formatter)
+
+    logger.addHandler(ch1)
+    logger.addHandler(ch2)
     return logger
