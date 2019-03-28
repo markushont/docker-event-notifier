@@ -26,6 +26,7 @@ Example Docker run command:
 The application is configured in `/app/conf.json`. The following sections can be included:
 
 ### Settings
+* `check_interval`: Interval (in seconds) between checking for new events
 * `logging`: Log level (debug, info warning, error)
 * `tags`: Optional extra tags to include in alerts
 * `mode = 'opt-in'|'opt-out'`: Opts in or out the containers that are listed in `names` below
@@ -55,6 +56,7 @@ Below is an example of `/app/conf.json`:
 ```json
 {
     "settings": {
+        "check_interval": "900",
         "logging": "info",
         "tags": [
             "foo-bar"

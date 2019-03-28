@@ -1,5 +1,6 @@
 {
     "settings": {
+        "check_interval": "900",
         "logging": "info",
         "tags": [
             "seh-green-01"

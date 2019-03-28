@@ -19,6 +19,9 @@ def load():
                 config['settings']['logging'] = 'info'
             if 'mode' not in config['settings']:
                 config['settings']['mode'] = 'opt-out'
+            config['settings']['check_interval'] =\
+                int(config['settings']['check_interval']) if 'check_interval' in config['settings'] else 900
+            assert(config['settings']['check_interval'] > 0)
         else:
             logger.warn('Settings not defined - loading defaults')
             config['settings'] = {'logging': 'info'}

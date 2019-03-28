@@ -9,20 +9,18 @@ import slack_alert
 import sys
 import time
 
-def send_alert(event, timestamp, severity):
-    logger.info('Alert triggered: {},{},{}'.format(
-        event['Type'],
-        event['Action'],
-        event['Actor']['ID']
-    ))
-    slack_alert.send(event=event, config=config, this_host=this_host, severity=severity, timestamp=timestamp)
+def send_alerts(events):
+    if len(events) == 0:
+        return
+    logger.info('Found %d relevant events' % len(events))
+    slack_alert.batch_send(events, config, this_host)
 
 def shutdown(_signo, _stack_frame):
   logger.info('Recieved {}, shutting down'.format(_signo))
   sys.exit(0)
 
 def should_send_alert(event, config):
-    event_actor_name = event['Actor']['Attributes']['name']
+    event_actor_name = event['Actor']['Attributes']['name'] if 'name' in event['Actor']['Attributes'] else ''
     name_in_config = event_actor_name in config['settings']['names']
     event_type = event['Type']
     event_action = event['Action']
@@ -49,18 +47,28 @@ def should_send_alert(event, config):
     return True   
 
 def main():
-    ''' Look for any event on the event stream that matches the defined event types  '''
-    for event in stream:
-        if should_send_alert(event, config):
-            event_type = event['Type']
-            event_action = event['Action']
-            timestamp = datetime.datetime.fromtimestamp(
-                event['time']).strftime('%c')
-            try:
+    while True:
+        time.sleep(config['settings']['check_interval'])
+
+        ''' Look for any event on the event stream that matches the defined event types  '''
+        logger.info('Checking for new events')
+        events = []
+        now = int(time.time())
+        then = now - config['settings']['check_interval']
+        stream = client.events(since=then, until=now, decode=True)
+        for event in stream:
+            if should_send_alert(event, config):
+                event_type = event['Type']
+                event_action = event['Action']
+                timestamp = datetime.datetime.fromtimestamp(
+                    event['time']).strftime('%c')
                 severity = config['events'][event_type][event_action]['severity'] or 'good'
-                send_alert(event, timestamp, severity)
-            except Exception as e:
-                logger.error('Error sending alert: {}'.format(e))
+                events.append({
+                    'event': event,
+                    'timestamp': timestamp,
+                    'severity': severity
+                })
+        send_alerts(events)
 
 
 if __name__ == "__main__":
@@ -70,7 +78,6 @@ if __name__ == "__main__":
     config = conf.load()
     try:
         client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-        stream = client.events(decode=True)
         this_host = os.environ['HOST_NAME'] or 'docker-events'
     except:
         logger.info('Failed to connect to Docker event stream')
