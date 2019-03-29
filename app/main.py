@@ -37,11 +37,11 @@ def should_send_alert(event, config):
 
     # Does not match attributes
     actor_attributes = event['Actor']['Attributes']
-    if 'attributes' in config['events'][event_type]:
+    if 'attributes' in config['events'][event_type][event_action]:
         # Go through attributes if configured
-        config_attributes = config['events'][event_type]['attributes']
+        config_attributes = config['events'][event_type][event_action]['attributes']
         for attribute in config_attributes:
-            if actor_attributes[attribute] != config[attribute]:
+            if attribute not in actor_attributes or actor_attributes[attribute] != config_attributes[attribute]:
                 return False
     
     return True   
