@@ -53,7 +53,7 @@ def send(event, config, this_host, severity, timestamp):
         payload['attachments'][0]['fields'].append(name_field)
 
     # Append tags to payload if exists
-    if 'tags' in config['settings']:
+    if 'tags' in config['settings'] and len(config['settings']['tags']):
         tags = ', '.join([str(x) for x in config['settings']['tags']])
         tags_field = {
             'title': 'Tags',
@@ -88,7 +88,7 @@ def batch_send(event_infos, config, this_host):
         'attachments': []
     }
 
-    if 'tags' in config['settings']:
+    if 'tags' in config['settings'] and len(config['settings']['tags']):
         tags = ', '.join([str(x) for x in config['settings']['tags']])
         payload['text'] += '\n*Tags:* %s' % tags
 
